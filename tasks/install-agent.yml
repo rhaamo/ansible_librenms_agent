@@ -3,6 +3,7 @@
     repo: '{{ librenms_agent_repository }}'
     dest: /opt/librenms-agent
     version: '{{ librenms_agent_version }}'
+    force: yes
 
 - name: Copy check_mk_agent
   copy:
