@@ -47,3 +47,27 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+
+- name: Fix some scripts execution bit
+  file:
+    path: '/opt/librenms-agent/snmp/{{ item }}'
+    mode: 0755
+  with_items:
+    - zfs-linux
+    - unbound
+    - asterisk
+    - bind
+    - chip.sh
+    - entropy.sh
+    - exim-stats.sh
+    - fail2ban
+    - fbsdnfsclient
+    - fbsdnfsserver
+    - freeradius.sh
+    - nvidia
+    - phpfpmsp
+    - pi-hole
+    - postgres
+    - powerdns-dnsdist
+    - sdfsinfo
+    - smart
