@@ -9,16 +9,19 @@
     src: /opt/librenms-agent/check_mk_agent
     dest: /usr/bin/check_mk_agent
     mode: u+r
+    remote_src: true
 
 - name: Install systemd service
   copy:
     src: /opt/librenms-agent/check_mk@.service
     dest: /etc/systemd/system/check_mk@.service
+    remote_src: true
 
 - name: Install systemd service socket
   copy:
     src: /opt/librenms-agent/check_mk.socket
     dest: /etc/systemd/system/check_mk.socket
+    remote_src: true
 
 - name: Create agent directories
   file:
@@ -35,6 +38,7 @@
     src: '/opt/librenms-agent/agent-local/{{ item }}'
     dest: '/usr/lib/check_mk_agent/local/{{ item }}'
     mode: 0755
+    remote_src: true
   with_flattened: '{{ librenms_agent_check_mk_scripts }}'
 
 - name: Enable check_mk service
