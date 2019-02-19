@@ -1,0 +1,8 @@
+---
+
+- name: "{{ ansible_os_family }} Family"
+  include_tasks: "setup-{{ ansible_os_family}}.yml"
+
+- name: "LibreNMS Agent installation"
+  include_tasks: install-agent.yml
+  

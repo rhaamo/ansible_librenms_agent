@@ -1,0 +1,45 @@
+- name: Clone LibreNMS Agent repository
+  git:
+    repo: '{{ librenms_agent_repository }}'
+    dest: /opt/librenms-agent
+    version: '{{ librenms_agent_version }}'
+
+- name: Copy check_mk_agent
+  copy:
+    src: /opt/librenms-agent/check_mk_agent
+    dest: /usr/bin/check_mk_agent
+    mode: u+r
+
+- name: Install systemd service
+  copy:
+    src: /opt/librenms-agent/check_mk@.service
+    dest: /etc/systemd/system/check_mk@.service
+
+- name: Install systemd service socket
+  copy:
+    src: /opt/librenms-agent/check_mk.socket
+    dest: /etc/systemd/system/check_mk.socket
+
+- name: Create agent directories
+  file:
+    path: '{{ item.item }}'
+    state: directory
+  with_items:
+    - /usr/lib/check_mk_agent/plugins
+    - /usr/lib/check_mk_agent/local
+
+# Install scripts from agent-local/ to /usr/lib/check_mk_agent/local and u+x
+
+- name: Install check_mk agent scripts
+  copy:
+    src: '/opt/librenms-agent/agent-local/{{ item }}'
+    dest: '/usr/lib/check_mk_agent/local/{{ item }}'
+    mode: 0755
+  with_flattened: '{{ librenms_agent_check_mk_scripts }}'
+
+- name: Enable check_mk service
+  systemd:
+    name: check_mk.socket
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

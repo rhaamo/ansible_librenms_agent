@@ -1,0 +1,8 @@
+---
+
+- name: Ensure that HTTPS transport for APT is installed
+  apt:
+    name: "apt-transport-https"
+    state: present
+  when: ansible_distribution == 'Debian'
+  
