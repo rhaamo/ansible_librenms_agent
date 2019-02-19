@@ -25,7 +25,7 @@
 
 - name: Create agent directories
   file:
-    path: '{{ item.item }}'
+    path: '{{ item }}'
     state: directory
   with_items:
     - /usr/lib/check_mk_agent/plugins
