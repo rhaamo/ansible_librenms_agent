@@ -14,7 +14,7 @@
 - name: Install systemd service
   copy:
     src: /opt/librenms-agent/check_mk@.service
-    dest: /etc/systemd/system/check_mk.service
+    dest: /etc/systemd/system/check_mk@.service
     remote_src: true
 
 - name: Install systemd service socket
@@ -44,13 +44,6 @@
 - name: Enable check_mk service socket
   systemd:
     name: check_mk.socket
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
-
-- name: Enable check_mk service
-  systemd:
-    name: check_mk.service
     state: restarted
     enabled: yes
     daemon_reload: yes
