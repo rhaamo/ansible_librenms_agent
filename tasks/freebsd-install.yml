@@ -1,0 +1,44 @@
+- name: Copy check_mk_agent
+  copy:
+    src: "/opt/librenms-agent/check_mk_agent_freebsd"
+    dest: "{{ prefix }}/bin/check_mk_agent"
+    mode: "0755"
+    remote_src: true
+
+- name: Create xinetd directory
+  file:
+    path: "{{prefix}}/etc/xinet.d/"
+    state: directory
+
+- name: Deploy xinetd config
+  copy:
+    src: "/opt/librenms-agent/check_mk_xinetd"
+    dest: "{{ prefix }}/etc/xinet.d/check_mk"
+    remote_src: true
+
+- name: Copy mk_enplug
+  copy:
+    src: "/opt/librenms-agent/mk_enplug"
+    dest: "{{ prefix }}/bin"
+    remote_src: true
+
+- name: Copy distro
+  copy:
+    src: "/opt/librenms-agent/snmp/distro"
+    dest: "{{ prefix }}/bin"
+    remote_src: true
+
+- name: Configure check_mk xinetd
+  replace:
+    path: "{{ prefix }}/etc/xinet.d/check_mk"
+    regexp: '\/usr\/bin\/check_mk_agent$'
+    replace: '/usr/local/bin/check_mk_agent'
+
+- name: Enable xinetd
+  shell: service xinetd enable
+
+- name: Start xinetd
+  service:
+    name: xinetd
+    state: "started"
+    enabled: True

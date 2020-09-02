@@ -4,4 +4,3 @@
   yum:
     name: "epel-release"
     state: present
-  when: ansible_distribution == 'RedHat'

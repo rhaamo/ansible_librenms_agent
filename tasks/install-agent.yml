@@ -5,55 +5,37 @@
     version: '{{ librenms_agent_version }}'
     force: yes
 
-- name: Copy check_mk_agent
-  copy:
-    src: /opt/librenms-agent/check_mk_agent
-    dest: /usr/bin/check_mk_agent
-    mode: 0755
-    remote_src: true
-
-- name: Install systemd service
-  copy:
-    src: /opt/librenms-agent/check_mk@.service
-    dest: /etc/systemd/system/check_mk@.service
-    remote_src: true
-  when: ansible_service_mgr == 'systemd'
-
-- name: Install systemd service socket
-  copy:
-    src: /opt/librenms-agent/check_mk.socket
-    dest: /etc/systemd/system/check_mk.socket
-    remote_src: true
-  when: ansible_service_mgr == 'systemd'
+- name: "get {{ ansible_os_family }} variables"
+  include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Create agent directories
   file:
     path: '{{ item }}'
     state: directory
   with_items:
-    - /usr/lib/check_mk_agent/plugins
-    - /usr/lib/check_mk_agent/local
+    - "{{ prefix }}/lib/check_mk_agent/plugins"
+    - "{{ prefix }}/lib/check_mk_agent/local"
 
 - name: Install check_mk agent scripts
   copy:
     src: '/opt/librenms-agent/agent-local/{{ item }}'
-    dest: '/usr/lib/check_mk_agent/local/{{ item }}'
-    mode: 0755
+    dest: "{{prefix}}/lib/check_mk_agent/local/{{ item }}"
+    mode: "0755"
     remote_src: true
   with_flattened: '{{ librenms_agent_check_mk_scripts }}'
 
-- name: Enable check_mk service socket
-  systemd:
-    name: check_mk.socket
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
+- name: systemd-like post-install
+  include_tasks: systemd-install.yml
   when: ansible_service_mgr == 'systemd'
+
+- name: freebsd post-install
+  include_tasks: freebsd-install.yml
+  when: ansible_os_family == 'FreeBSD'
 
 - name: Fix some scripts execution bit
   file:
     path: '/opt/librenms-agent/snmp/{{ item }}'
-    mode: 0755
+    mode: "0755"
   with_items:
     - zfs-linux
     - unbound
@@ -73,5 +55,4 @@
     - powerdns-dnsdist
     - sdfsinfo
     - smart
-    - squid
 

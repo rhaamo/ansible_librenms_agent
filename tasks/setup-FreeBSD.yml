@@ -1,0 +1,11 @@
+---
+
+- name: Ensure required packages are installed
+  pkgng:
+    name:
+      - git
+      - bash
+      - xinetd
+      - libstatgrab
+    state: present
+
